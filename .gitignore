@@ -1,0 +1,6 @@
+node_moules
+/Deployify-Deploy-Service/node_modules
+/Deployify-Upload-Service/node_modules
+/Deployify-Deploy-Service/.env
+/Deployify-Upload-Service/.env
+.env
