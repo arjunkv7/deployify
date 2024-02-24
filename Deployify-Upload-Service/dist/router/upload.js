@@ -16,6 +16,8 @@ const express_1 = require("express");
 const generateId_1 = require("../utils/generateId");
 const zod_1 = __importDefault(require("zod"));
 const ioredis_1 = __importDefault(require("ioredis"));
+const uuid_1 = require("../utils/uuid");
+const prisma_1 = __importDefault(require("../db/prisma"));
 let reqPayloadSchema = zod_1.default.object({
     repositoryUrl: zod_1.default.string(),
 });
@@ -42,11 +44,18 @@ router.post("/", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         };
         yield publisher.rpush("build-queue", JSON.stringify(queueObj));
         console.log(`${uniqueId} ${repositoryUrl} is added to the queue`);
-        // let cloneId = await cloneRepo(repositoryUrl);
-        // let files = getAllFiles(path.join(__dirname,`../output/${cloneId}`));
-        // files.forEach(async file => {
-        //     await uploadFile(file.slice(__dirname.length + 1), file);
-        // })
+        let uuid = yield (0, uuid_1.createId)();
+        let objectPath = `outputs/${uniqueId}/`;
+        let defaultPath = `outputs/${uniqueId}/index.html`;
+        yield prisma_1.default.websiteKey.create({
+            data: {
+                uniqueId: uniqueId,
+                key: uuid,
+                objectPath: objectPath,
+                defaultPath: defaultPath,
+                status: "Queued"
+            }
+        });
         return res.status(200).json({
             id: uniqueId,
         });

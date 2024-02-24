@@ -1,5 +1,5 @@
 export async function generateId() {
-    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz123456789';
+    const characters = 'abcdefghijklmnopqrstuvwxyz123456789';
     let length = 6;
     let uniqueId = '';
 

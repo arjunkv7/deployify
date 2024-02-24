@@ -18,18 +18,22 @@ const path_1 = __importDefault(require("path"));
 const uploadFile_1 = __importDefault(require("./uploadFile"));
 function uploadFolder(distFolderPath, remotePath) {
     return __awaiter(this, void 0, void 0, function* () {
-        const distFolderContents = fs_1.default.readdirSync(distFolderPath);
-        for (const file of distFolderContents) {
-            const key = path_1.default.join(remotePath, file.toString());
-            const filePath = path_1.default.join(distFolderPath, file.toString());
-            if (fs_1.default.lstatSync(filePath).isDirectory()) {
-                yield uploadFolder(filePath, key);
+        try {
+            const distFolderContents = fs_1.default.readdirSync(distFolderPath);
+            for (const file of distFolderContents) {
+                const key = path_1.default.join(remotePath, file.toString());
+                const filePath = path_1.default.join(distFolderPath, file.toString());
+                if (fs_1.default.lstatSync(filePath).isDirectory()) {
+                    yield uploadFolder(filePath, key);
+                }
+                else {
+                    console.log("uploading", filePath);
+                    yield (0, uploadFile_1.default)(filePath, key);
+                }
             }
-            else {
-                console.log("uploading", filePath);
-                yield (0, uploadFile_1.default)(filePath, key);
-            }
-            // console.log("uploaded", filePath);
+        }
+        catch (error) {
+            console.log("Error :", error);
         }
     });
 }

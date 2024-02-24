@@ -12,7 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.generateId = void 0;
 function generateId() {
     return __awaiter(this, void 0, void 0, function* () {
-        const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz123456789';
+        const characters = 'abcdefghijklmnopqrstuvwxyz123456789';
         let length = 6;
         let uniqueId = '';
         for (let i = 0; i < length; i++) {

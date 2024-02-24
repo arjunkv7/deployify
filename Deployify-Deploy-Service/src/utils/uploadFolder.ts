@@ -3,18 +3,20 @@ import path from "path";
 import uploadFile from "./uploadFile";
 
 export async function uploadFolder(distFolderPath: string, remotePath: string) {
-  const distFolderContents = fs.readdirSync(distFolderPath);
+  try {
+    const distFolderContents = fs.readdirSync(distFolderPath);
 
-  for (const file of distFolderContents) {
-    const key = path.join(remotePath, file.toString());
-    const filePath = path.join(distFolderPath, file.toString());
-    if (fs.lstatSync(filePath).isDirectory()) {
-      await uploadFolder(filePath, key);
-    } else {
-      console.log("uploading", filePath);
-      await uploadFile(filePath, key);
+    for (const file of distFolderContents) {
+      const key = path.join(remotePath, file.toString());
+      const filePath = path.join(distFolderPath, file.toString());
+      if (fs.lstatSync(filePath).isDirectory()) {
+        await uploadFolder(filePath, key);
+      } else {
+        console.log("uploading", filePath);
+        await uploadFile(filePath, key);
+      }
     }
-
-    // console.log("uploaded", filePath);
+  } catch (error) {
+    console.log("Error :", error);
   }
 }
