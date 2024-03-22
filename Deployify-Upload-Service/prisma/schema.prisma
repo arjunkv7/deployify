@@ -19,5 +19,16 @@ model websiteKey {
   uniqueId    String  @unique
   defaultPath String?
   objectPath  String?
+  userId      Int?
   status      String  @default("Pending")
+  projectName String?
+  repositoryUrl String?
+}
+
+model user {
+  id        Int     @id @default(autoincrement())
+  firstName String
+  lastName  String?
+  emailId   String  @unique
+  password  String
 }

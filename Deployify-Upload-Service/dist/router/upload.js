@@ -18,22 +18,25 @@ const zod_1 = __importDefault(require("zod"));
 const ioredis_1 = __importDefault(require("ioredis"));
 const uuid_1 = require("../utils/uuid");
 const prisma_1 = __importDefault(require("../db/prisma"));
+const auth_1 = __importDefault(require("../middlewares/auth"));
 let reqPayloadSchema = zod_1.default.object({
     repositoryUrl: zod_1.default.string(),
+    projectName: zod_1.default.string(),
 });
 let publisher = new ioredis_1.default(process.env.REDIS_URL);
 let router = (0, express_1.Router)();
-router.post("/", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.post("/", auth_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
     try {
         let parsedPaylod = reqPayloadSchema.safeParse(req.body);
         if (!parsedPaylod.success) {
-            return res.status(400).json({
-                message: "Invalid repository URL",
+            return res.status(401).json({
+                message: "Invalid payload",
             });
         }
         let repositoryUrl = req.body.repositoryUrl;
         if (!repositoryUrl) {
-            return res.status(400).json({
+            return res.status(401).json({
                 message: "Repository URL is required",
             });
         }
@@ -53,8 +56,10 @@ router.post("/", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
                 key: uuid,
                 objectPath: objectPath,
                 defaultPath: defaultPath,
-                status: "Queued"
-            }
+                status: "Queued",
+                userId: (_a = req.user) === null || _a === void 0 ? void 0 : _a.id,
+                projectName: req.body.projectName,
+            },
         });
         return res.status(200).json({
             id: uniqueId,
@@ -65,6 +70,26 @@ router.post("/", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         res.status(400).json({
             message: "Something wrong",
         });
+    }
+}));
+router.get("/", auth_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _b, _c;
+    let id = (_b = req.query) === null || _b === void 0 ? void 0 : _b.id;
+    try {
+        let status = yield prisma_1.default.websiteKey.findUnique({
+            where: {
+                uniqueId: id,
+                userId: (_c = req.user) === null || _c === void 0 ? void 0 : _c.id,
+            },
+            select: {
+                status: true,
+            },
+        });
+        res.status(200).json({ status });
+    }
+    catch (error) {
+        console.log(error);
+        res.status(500).json({ message: "Something went wrong" });
     }
 }));
 exports.default = router;

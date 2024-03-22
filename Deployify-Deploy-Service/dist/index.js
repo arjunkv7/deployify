@@ -43,6 +43,7 @@ dotenv.config({ path: path_1.default.join(__dirname, "../.env") });
 const cloneRepo_1 = __importDefault(require("./utils/cloneRepo"));
 const deleteFolder_1 = require("./utils/deleteFolder");
 const uploadFolder_1 = require("./utils/uploadFolder");
+const updateStatus_1 = __importDefault(require("./utils/updateStatus"));
 let subscriber = new ioredis_1.default(process.env.REDIS_URL);
 function buildProcess() {
     var _a, _b, _c;
@@ -57,7 +58,8 @@ function buildProcess() {
             console.log("Clone end...");
             console.log("Build started...");
             let outDirPath = path_1.default.join(__dirname, `output/${resObj.uniqueId}`);
-            const child = (0, child_process_1.exec)(`cd ${outDirPath} && npm install && npm run build`);
+            console.log(outDirPath);
+            const child = (0, child_process_1.exec)(`cd '${outDirPath}' && npm install && npm run build`);
             (_a = child.stdout) === null || _a === void 0 ? void 0 : _a.on("data", function (data) {
                 console.log(data.toString());
             });
@@ -71,6 +73,7 @@ function buildProcess() {
                     let remotePath = `outputs/${resObj.uniqueId}`;
                     yield (0, uploadFolder_1.uploadFolder)(distFolderPath, remotePath);
                     (0, deleteFolder_1.deleteFolder)(path_1.default.join(__dirname, "output", resObj.uniqueId));
+                    (0, updateStatus_1.default)(resObj.uniqueId);
                     console.log("Done...");
                 });
             });

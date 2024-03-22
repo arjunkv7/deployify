@@ -8,6 +8,7 @@ import cloneRepo from "./utils/cloneRepo";
 import uploadFile from "./utils/uploadFile";
 import { deleteFolder } from "./utils/deleteFolder";
 import { uploadFolder } from "./utils/uploadFolder";
+import updateStatus from "./utils/updateStatus";
 
 interface queueObj {
   uniqueId: string;
@@ -27,7 +28,8 @@ async function buildProcess() {
 
     console.log("Build started...");
     let outDirPath = path.join(__dirname, `output/${resObj.uniqueId}`);
-    const child = exec(`cd ${outDirPath} && npm install && npm run build`);
+    console.log(outDirPath)
+    const child = exec(`cd '${outDirPath}' && npm install && npm run build`);
 
     child.stdout?.on("data", function (data) {
       console.log(data.toString());
@@ -50,6 +52,9 @@ async function buildProcess() {
       let remotePath = `outputs/${resObj.uniqueId}`;
       await uploadFolder(distFolderPath, remotePath);
       deleteFolder(path.join(__dirname, "output", resObj.uniqueId));
+      updateStatus(resObj.uniqueId);
+     
+
       console.log("Done...");
     });
   }
