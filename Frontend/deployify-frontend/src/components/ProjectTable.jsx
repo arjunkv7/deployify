@@ -2,6 +2,8 @@
 import React from 'react';
 
 const ProjectTable = ({ projects }) => {
+  let domain = process.env.REACT_APP_WEBSITE_DOMAIN;
+  console.log(`${projects[0]?.uniqueId}.${domain}`)
   return (
     <div className="max-w-screen-lg mx-auto mt-8">
       <div className="overflow-x-auto">
@@ -26,11 +28,11 @@ const ProjectTable = ({ projects }) => {
                 <td className="px-6 py-4 border-b border-gray-200 dark:border-gray-300">
                   <a
                     className="text-blue-600 dark:text-blue-400 hover:underline"
-                    href={project.url}
+                    href={`http://${project.uniqueId}.${domain}`}
                     target="_blank"
-                    rel="noopener noreferrer"
+                    rel=""
                   >
-                    {project.url}
+                    {`${project.uniqueId}.${domain}`}
                   </a>
                 </td>
               </tr>
